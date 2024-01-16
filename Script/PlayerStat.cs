@@ -3,10 +3,6 @@ using UnityEngine;
 // 이 스크립트는 플레이어의 스테이터스를 관리합니다.
 public class PlayerStat : MonoBehaviour
 {
-    private Player player;
-    private Animator animator;
-    private Skill skill;
-
     private int level = 1;
     private int exp = 0;
     private int maxExp = 10;
@@ -30,8 +26,11 @@ public class PlayerStat : MonoBehaviour
     private event System.Action<int> OnAtkChangedEvent;
     private event System.Action<int> OnDefChangedEvent;
     private event System.Action OnDeathEvent;
-    
 
+    private Player player;
+    private Animator animator;
+    private Skill skill;
+    
     public int GetLevel() => level;
     public int GetExp() => exp;
     public int GetMaxExp() => maxExp;
@@ -45,7 +44,7 @@ public class PlayerStat : MonoBehaviour
     public int GetDef() => def_player + def_equip;
     public Item GetWeapon() => weapon;
     public Item GetShield() => shield;
-
+    
     private void Awake() 
     {
         animator = GetComponent<Animator>();
