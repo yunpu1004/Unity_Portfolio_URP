@@ -4,14 +4,7 @@ using UnityEngine.AI;
 // 이 스크립트는 몬스터의 행동, 상태 변화 및 플레이어와의 전투를 지시 및 제어합니다.
 public class Monster : MonoBehaviour
 {
-    private Animator animator;
-    private NavMeshAgent agent;
-    private ChaseTrigger chaseTrigger;
-    private Transform playerTransform;
-    private MonsterStat monsterStat;
-    private Weapon weapon;
-
-    public MonsterState state = MonsterState.Idle;
+    private MonsterState state = MonsterState.Idle;
     private float idleTime = 0;
     private float maxIdleTime = 3;
     private float lostSightChaseDuration = 0;
@@ -20,6 +13,13 @@ public class Monster : MonoBehaviour
     private float maxAttackDelay = 3;
     private float respawnIdle = 0;
     private float maxRespawnIdle = 1;
+    
+    private Animator animator;
+    private NavMeshAgent agent;
+    private ChaseTrigger chaseTrigger;
+    private Transform playerTransform;
+    private MonsterStat monsterStat;
+    private Weapon weapon;
 
     void Awake()
     {
