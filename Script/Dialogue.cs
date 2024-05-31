@@ -36,7 +36,7 @@ public class Dialogue : MonoBehaviour
         if(dialogueData == null) return;
         if(dialogueData.IsEnd()) SetDialogue(null);
         else if(!dialogueData.HasNextDialogue()) return;
-        else SetDialogue(DataLoader.instance.GetDialogueData(dialogueData.nextDialogueId));
+        else SetDialogue(DataManager.instance.GetDialogueData(dialogueData.nextDialogueId));
     }
 
     /// 이 메소드는 에디터에 의해서 각 옵션 오브젝트의 Button.OnClick 이벤트에 연결되어 있습니다.
@@ -44,7 +44,7 @@ public class Dialogue : MonoBehaviour
     {
         if(dialogueData == null) return;
         if(dialogueData.IsEnd()) SetDialogue(null);
-        else SetDialogue(DataLoader.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(0)));
+        else SetDialogue(DataManager.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(0)));
     }
 
     /// 이 메소드는 에디터에 의해서 각 옵션 오브젝트의 Button.OnClick 이벤트에 연결되어 있습니다.
@@ -52,7 +52,7 @@ public class Dialogue : MonoBehaviour
     {
         if(dialogueData == null) return;
         if(dialogueData.IsEnd()) SetDialogue(null);
-        else SetDialogue(DataLoader.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(1)));
+        else SetDialogue(DataManager.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(1)));
     }
 
     /// 이 메소드는 에디터에 의해서 각 옵션 오브젝트의 Button.OnClick 이벤트에 연결되어 있습니다.
@@ -60,7 +60,7 @@ public class Dialogue : MonoBehaviour
     {
         if(dialogueData == null) return;
         if(dialogueData.IsEnd()) SetDialogue(null);
-        else SetDialogue(DataLoader.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(2)));
+        else SetDialogue(DataManager.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(2)));
     }
 
     /// 이 메소드는 에디터에 의해서 각 옵션 오브젝트의 Button.OnClick 이벤트에 연결되어 있습니다.
@@ -68,7 +68,7 @@ public class Dialogue : MonoBehaviour
     {
         if(dialogueData == null) return;
         if(dialogueData.IsEnd()) SetDialogue(null);
-        else SetDialogue(DataLoader.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(3)));
+        else SetDialogue(DataManager.instance.GetDialogueData(dialogueData.GetOptionNextDialogueId(3)));
     }
 
     public void AddOnDialogueDataChangedEvent(Action<DialogueData> onDialogueDataChanged)

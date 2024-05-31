@@ -29,7 +29,7 @@ public class Quest : MonoBehaviour
     public void AddQuest(string questId)
     {
         if(currentQuests.ContainsKey(questId)) return;
-        var quest = DataLoader.instance.GetQuestData(questId);
+        var quest = DataManager.instance.GetQuestData(questId);
         currentQuests.Add(questId, quest);
         var values = currentQuests.Values.ToArray();
         onCurrentQuestsUpdated?.Invoke(values);

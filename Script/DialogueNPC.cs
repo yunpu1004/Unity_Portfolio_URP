@@ -9,7 +9,7 @@ public class DialogueNPC : MonoBehaviour
 
     private void Awake() 
     {
-        var dialogueData = DataLoader.instance.GetDialogueData(firstDialogueId);
+        var dialogueData = DataManager.instance.GetDialogueData(firstDialogueId);
         interaction.SetInteraction(name, () => dialogue.SetDialogue(dialogueData));
     }
 }

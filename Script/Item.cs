@@ -1,10 +1,13 @@
+using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 // 이 스크립트는 아이템 데이터를 관리합니다.
 // 아이템 습득, 거래, 사용 등의 기능은 이 구조체를 생성 또는 수정하는 방식으로 구현됩니다.
-[System.Serializable]
+[Serializable]
 public struct Item
 {
+    public string id;
     public string name;
     public ItemType type;
     public Sprite sprite;
@@ -16,6 +19,29 @@ public struct Item
     public int hp_recover;
 
     public bool IsEmpty() => count == 0;
+    public bool IsNull() => string.IsNullOrEmpty(id);
+
+    public Item(string csvLine, int count = 0)
+    {
+        var pattern = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        string[] arr = Regex.Split(csvLine, pattern);
+        for(int i = 0; i < arr.Length; i++)
+        {
+            arr[i] = arr[i].Trim(' ', '"', '\r', '\n');
+        }
+
+        if(arr.Length != 8) throw new Exception("Item 생성자의 인자로 전달되는 arr의 길이가 8이 아닙니다.");
+        id = arr[0];
+        name = arr[1];
+        type = Enum.Parse<ItemType>(arr[2]);
+        sprite = Resources.Load<Sprite>("Image/Items/" + name); 
+        sellPrice = int.Parse(arr[3]);
+        buyPrice = int.Parse(arr[4]);
+        atk_equip = int.Parse(arr[5]);
+        def_equip = int.Parse(arr[6]);
+        hp_recover = int.Parse(arr[7]); 
+        this.count = count;
+    }
 
     // 아이템을 사용합니다. (아이템의 종류에 따라 다른 동작을 수행합니다.)
     public void Use()
@@ -89,81 +115,6 @@ public struct Item
             count = 1,
             type = ItemType.Shield,
             sprite = Resources.Load<Sprite>("Image/Items/기본방패"),
-        };
-        return item;
-    }
-
-    public static Item GetPowerSword()
-    {
-        var item = new Item
-        {
-            name = "파워검",
-            sellPrice = 100,
-            buyPrice = 200,
-            count = 1,
-            type = ItemType.Weapon,
-            atk_equip = 5,
-            sprite = Resources.Load<Sprite>("Image/Items/파워검"),
-        };
-        return item;
-    }
-
-    public static Item GetPowerShield()
-    {
-        var item = new Item
-        {
-            name = "파워방패",
-            sellPrice = 100,
-            buyPrice = 200,
-            count = 1,
-            type = ItemType.Shield,
-            def_equip = 3,
-            sprite = Resources.Load<Sprite>("Image/Items/파워방패"),
-        };
-        return item;
-    }
-
-    public static Item GetGlaive()
-    {
-        var item = new Item
-        {
-            name = "글레이브",
-            sellPrice = 200,
-            buyPrice = 400,
-            count = 1,
-            type = ItemType.Weapon,
-            atk_equip = 10,
-            sprite = Resources.Load<Sprite>("Image/Items/글레이브"),
-        };
-        return item;
-    }
-    
-    public static Item GetRoyalShield()
-    {
-        var item = new Item
-        {
-            name = "로얄방패",
-            sellPrice = 200,
-            buyPrice = 400,
-            count = 1,
-            type = ItemType.Shield,
-            def_equip = 5,
-            sprite = Resources.Load<Sprite>("Image/Items/로얄방패"),
-        };
-        return item;
-    }
-
-    public static Item GetHealthPotion(int count)
-    {
-        var item = new Item
-        {
-            name = "체력포션",
-            sellPrice = 5,
-            buyPrice = 10,
-            count = count,
-            type = ItemType.Consumable,
-            hp_recover = 50,
-            sprite = Resources.Load<Sprite>("Image/Items/체력포션"),
         };
         return item;
     }

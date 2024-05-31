@@ -4,8 +4,8 @@ using UnityEngine;
 // 이 스크립트는 필드 아이템의 동작과 상호작용을 담당합니다.
 public class FieldItem : MonoBehaviour
 {
-    private static Dictionary<string, GameObject> itemPrefabs;
-    private static GameObject parent;
+    // 아이템의 id를 키로 사용하여 프리팹을 저장합니다.
+    private static GameObject fieldItems;
     private Interaction interaction;
     private Inventory inventory;
 
@@ -14,12 +14,12 @@ public class FieldItem : MonoBehaviour
 
     private void Awake() 
     {
+        fieldItems = GameObject.Find("FieldItems");
         inventory = GameObject.Find("Player").GetComponent<Inventory>();
         interaction = GetComponent<Interaction>();
 
         timeElapsed = 0;
         name = transform.name.Replace("(Clone)", "");
-
         interaction.SetInteraction(name + " 획득", Pickup);
     }
 
@@ -43,41 +43,22 @@ public class FieldItem : MonoBehaviour
         }
     }
 
-    // FieldItems 폴더에 있는 프리팹을 로드합니다.
-    private static void LoadItemPrefabs()
-    {
-        if(itemPrefabs != null) return;
-        
-        itemPrefabs = new Dictionary<string, GameObject>();
-
-        GameObject[] prefabs = Resources.LoadAll<GameObject>("FieldItems");
-        foreach(GameObject prefab in prefabs) 
-        {
-            itemPrefabs.Add(prefab.name, prefab);
-        }
-
-        parent = GameObject.Find("FieldItems");
-    }
-
     // 지정된 위치에 아이템을 생성합니다.
-    public static GameObject CreateFieldItem(string itemName, Vector3 position)
+    public static GameObject CreateFieldItem(Item item, Vector3 position)
     {
-        if(itemPrefabs == null) 
+        var itemPrefabDict = DataManager.instance.GetItemPrefab(item.id);
+        if(itemPrefabDict != null) 
         {
-            LoadItemPrefabs();
-        }
-
-        if(itemPrefabs.ContainsKey(itemName)) 
-        {
-            var go = Instantiate(itemPrefabs[itemName], position, Quaternion.identity);
+            var go = Instantiate(itemPrefabDict, position, Quaternion.identity);
             go.name = go.name.Replace("(Clone)", "");
-            go.transform.SetParent(parent.transform);
+            go.transform.SetParent(fieldItems.transform);
             go.SetActive(true);
+            go.GetComponent<FieldItem>().item = item;
             return go;
         }
         else 
         {
-            Debug.LogError($"아이템 프리팹을 찾을 수 없습니다. {itemName}");
+            Debug.LogError($"아이템 프리팹을 찾을 수 없습니다. {item}");
             return null;
         }
     }
