@@ -20,9 +20,9 @@ public class MonsterStat : MonoBehaviour
     public int GetExp() => exp;
     public bool IsDead() => hp <= 0;
 
-    private event Action<int, int> OnHPChangedEvent;
-    private event Action<int> OnDamageEvent;
-    private event Action OnDeathEvent;
+    public event Action<int, int> OnHPChangedEvent;
+    public event Action<int> OnDamageEvent;
+    public event Action OnDeathEvent;
 
     private void Start() 
     {
@@ -69,21 +69,6 @@ public class MonsterStat : MonoBehaviour
         OnHPChangedEvent?.Invoke(hp, maxHP);
     }
 
-    public void AddOnHPChangedEvent(Action<int, int> action)
-    {
-        OnHPChangedEvent += action;
-    }
-
-    public void AddOnDamageEvent(Action<int> action)
-    {
-        OnDamageEvent += action;
-    }
-
-    public void AddOnDeathEvent(Action action)
-    {
-        OnDeathEvent += action;
-    }
-
     // HP를 최대치로 회복합니다.
     public void RestoreHP()
     {
@@ -91,6 +76,7 @@ public class MonsterStat : MonoBehaviour
         OnHPChangedEvent?.Invoke(hp, maxHP);
     }
 
+    // 몬스터가 죽었을 때 생성되는 아이템의 드롭 테이블을 반환합니다.
     public ReadOnlyCollection<(Item item, float dropRate)> GetDropTable()
     {
         return Array.AsReadOnly(dropTable);

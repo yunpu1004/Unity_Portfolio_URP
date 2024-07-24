@@ -22,19 +22,15 @@ public abstract class Monster : MonoBehaviour
         monsterStat = GetComponent<MonsterStat>();
         rigidbody = GetComponent<Rigidbody>();
         weapon = GetComponentInChildren<Weapon>(true);
-        monsterState = SetMonsterStateOnAwake();
-
-        // 이벤트 등록
-        var playerStat = playerTransform.GetComponent<PlayerStat>();
-        var playerActivity = playerTransform.GetComponent<PlayerActivity>();
-        monsterStat.AddOnDamageEvent((damage) => animator.SetTrigger("Hit"));
-        monsterStat.AddOnDeathEvent(() => playerStat.GainExp(monsterStat.GetExp()));
-        monsterStat.AddOnDeathEvent(() => animator.SetTrigger("Die"));
-        monsterStat.AddOnDeathEvent(() => playerActivity.SetRecentActivity(new PlayerActivityData{activityType = PlayerActivityData.ActivityType.Kill, activityTarget = name}));
+        monsterState = SetMonsterInitialState();
+        SetAwakeStrategy().OnAwake(gameObject);
     }
 
-    // Awake 시점에 몬스터의 종류에 알맞는 상태 객체를 할당합니다.
-    protected abstract IMonsterState SetMonsterStateOnAwake();
+    // 몬스터의 초기화를 실행하는 객체를 반환합니다.
+    protected abstract IAwakeStrategy SetAwakeStrategy();
+
+    // 몬스터의 초기 상태에 대한 객체를 반환합니다.
+    protected abstract IMonsterState SetMonsterInitialState();
 
     // 몬스터의 상태를 변경합니다.
     public void SetMonsterState(IMonsterState state)
@@ -77,5 +73,11 @@ public abstract class Monster : MonoBehaviour
     private void DeactivateWeapon()
     {
         weapon.DeactivateWeapon();
+    }
+
+    // 이 메소드는 애니메이션 이벤트로 호출됨
+    private void OnDeathAnimationEnd()
+    {
+        SetMonsterState(new WolfRespawnState(this));
     }
 }

@@ -1,32 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// 이 클래스는 늑대 몬스터의 대기 상태를 담당합니다.
 public class WolfIdleState : IMonsterState
 {
-    private Monster monster;
+    private Wolf wolf;
     private float idleTime = 0;
-    private readonly float maxIdleTime = 3;
+    private const float maxIdleTime = 3;
 
     public WolfIdleState(Monster monster)
     {
-        this.monster = monster;
+        wolf = monster as Wolf;
     }
 
     public void OnFixedUpdate()
     {
-        if(monster.monsterStat.IsDead())
+        if(wolf.monsterStat.IsDead())
         {
-            monster.SetMonsterState(new WolfDeadState(monster));
+            wolf.SetMonsterState(new WolfDeadState(wolf));
         }
-        else if(monster.chaseTrigger.IsInSight())
+        else if(wolf.chaseTrigger.inSight)
         {
-            monster.SetMonsterState(new WolfFightState(monster));
+            wolf.SetMonsterState(new WolfFightState(wolf));
         }
         else if(idleTime > maxIdleTime)
         {
-            monster.SetMonsterState(new WolfWanderState(monster));
+            wolf.SetMonsterState(new WolfWanderState(wolf));
         }
         else
         {
@@ -36,9 +35,9 @@ public class WolfIdleState : IMonsterState
 
     public void OnEnterState()
     {
-        monster.navMeshAgent.ResetPath();
-        monster.navMeshAgent.speed = 0;
-        monster.animator.SetFloat("Speed", 0);
+        wolf.navMeshAgent.ResetPath();
+        wolf.navMeshAgent.speed = 0;
+        wolf.animator.SetFloat("Speed", 0);
     }
 
     public void OnExitState()
@@ -48,60 +47,61 @@ public class WolfIdleState : IMonsterState
 }
 
 
-
+// 이 클래스는 늑대 몬스터의 전투 상태를 담당합니다.
 public class WolfFightState : IMonsterState
 {
-    private Monster monster;
+    private Wolf wolf;
     private float attackDelay = 0;
-    private readonly float maxAttackDelay = 3;
+    private const float maxAttackDelay = 3;
     private float lostSightChaseDuration = 0;
-    private float maxLostSightChaseDuration = 5;
+    private const float maxLostSightChaseDuration = 5;
+    private const float moveSpeed = 5;
 
     public WolfFightState(Monster monster)
     {
-        this.monster = monster;
+        wolf = monster as Wolf;
     }
 
     public void OnFixedUpdate()
     {
-        monster.animator.SetFloat("Speed", monster.navMeshAgent.velocity.magnitude);
+        wolf.animator.SetFloat("Speed", wolf.navMeshAgent.velocity.magnitude);
 
-        if(monster.monsterStat.IsDead())
+        if(wolf.monsterStat.IsDead())
         {
-            monster.SetMonsterState(new WolfDeadState(monster));
+            wolf.SetMonsterState(new WolfDeadState(wolf));
         }
 
         else if(lostSightChaseDuration > maxLostSightChaseDuration)
         {
-            monster.SetMonsterState(new WolfIdleState(monster));
+            wolf.SetMonsterState(new WolfIdleState(wolf));
         }
         
         else
         {
             // 플레이어를 추적
-            monster.navMeshAgent.SetDestination(monster.playerTransform.position);
+            wolf.navMeshAgent.SetDestination(wolf.playerTransform.position);
 
             // 플레이어가 시야에서 벗어나더라도 일정 시간 동안 추적
-            if(monster.chaseTrigger.IsInSight()) lostSightChaseDuration = 0;
+            if(wolf.chaseTrigger.inSight) lostSightChaseDuration = 0;
             else lostSightChaseDuration += Time.deltaTime;
 
             // 플레이어가 몬스터와 가까이 있으면
-            if (monster.navMeshAgent.remainingDistance <= monster.navMeshAgent.stoppingDistance)
+            if (wolf.navMeshAgent.remainingDistance <= wolf.navMeshAgent.stoppingDistance)
             {
                 // 대상을 바라보는 방향 계산
-                Vector3 direction = (monster.playerTransform.position - monster.transform.position).normalized;
+                Vector3 direction = (wolf.playerTransform.position - wolf.transform.position).normalized;
                 direction.y = 0;
 
                 // 몬스터의 바라볼 방향으로 쿼터니언을 계산
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
                 // 회전을 부드럽게 조절
-                monster.transform.rotation = Quaternion.Slerp(monster.transform.rotation, lookRotation, Time.deltaTime * 5f);
+                wolf.transform.rotation = Quaternion.Slerp(wolf.transform.rotation, lookRotation, Time.deltaTime * 5f);
 
                 // 공격 딜레이 갱신
                 attackDelay += Time.deltaTime;
                 if(attackDelay > maxAttackDelay)
                 {
-                    monster.animator.SetTrigger("Attack");
+                    wolf.animator.SetTrigger("Attack");
                     attackDelay = 0;
                 }
             }
@@ -110,7 +110,7 @@ public class WolfFightState : IMonsterState
 
     public void OnEnterState()
     {
-        monster.navMeshAgent.speed = 5;
+        wolf.navMeshAgent.speed = moveSpeed;
     }
 
     public void OnExitState()
@@ -120,39 +120,39 @@ public class WolfFightState : IMonsterState
 }
 
 
-
+// 이 클래스는 늑대 몬스터의 방황 상태를 담당합니다.
 public class WolfWanderState : IMonsterState
 {
-    private Monster monster;
+    private Wolf wolf;
 
     public WolfWanderState(Monster monster)
     {
-        this.monster = monster;
+        wolf = monster as Wolf;
     }
 
     public void OnFixedUpdate()
     {
-        monster.animator.SetFloat("Speed", monster.navMeshAgent.velocity.magnitude);
+        wolf.animator.SetFloat("Speed", wolf.navMeshAgent.velocity.magnitude);
 
-        if(monster.monsterStat.IsDead())
+        if(wolf.monsterStat.IsDead())
         {
-            monster.SetMonsterState(new WolfDeadState(monster));
+            wolf.SetMonsterState(new WolfDeadState(wolf));
         }
-        else if(monster.chaseTrigger.IsInSight())
+        else if(wolf.chaseTrigger.inSight)
         {
-            monster.SetMonsterState(new WolfFightState(monster));
+            wolf.SetMonsterState(new WolfFightState(wolf));
         }
-        else if(monster.navMeshAgent.remainingDistance <= monster.navMeshAgent.stoppingDistance)
+        else if(wolf.navMeshAgent.remainingDistance <= wolf.navMeshAgent.stoppingDistance)
         {
-            monster.SetMonsterState(new WolfIdleState(monster));
+            wolf.SetMonsterState(new WolfIdleState(wolf));
         }
     }
 
     // 몬스터가 방황을 시작할때, 일정 범위 내의 랜덤한 위치로 목적지를 설정합니다.
     public void OnEnterState()
     {
-        monster.navMeshAgent.speed = 1;
-        monster.animator.SetFloat("Speed", monster.navMeshAgent.velocity.magnitude);
+        wolf.navMeshAgent.speed = 1;
+        wolf.animator.SetFloat("Speed", wolf.navMeshAgent.velocity.magnitude);
         int maxTryCount = 10;
         float wanderRange = 20;
 
@@ -164,13 +164,13 @@ public class WolfWanderState : IMonsterState
 
             // agent가 현재 위치로부터 일정거리 안에 있는 랜덤한 위치로 이동
             var randomPos = Random.insideUnitCircle * wanderRange;
-            var destPos = monster.transform.position + new Vector3(randomPos.x, 0, randomPos.y);
+            var destPos = wolf.transform.position + new Vector3(randomPos.x, 0, randomPos.y);
 
             // destPos가 NavMesh 위에 있는지 확인
             NavMeshHit hit;
             if (NavMesh.SamplePosition(destPos, out hit, 1.5f, NavMesh.AllAreas))
             {
-                monster.navMeshAgent.SetDestination(hit.position);
+                wolf.navMeshAgent.SetDestination(hit.position);
                 return;
             }
         }
@@ -183,36 +183,43 @@ public class WolfWanderState : IMonsterState
 }
 
 
-
+// 이 클래스는 늑대 몬스터의 사망 상태를 담당합니다.
 public class WolfDeadState : IMonsterState
 {
-    private Monster monster;
+    private Wolf wolf;
+    private float deadStateDuration = 0;
+    private const float maxDeadStateDuration = 5;
 
     public WolfDeadState(Monster monster)
     {
-        this.monster = monster;
+        wolf = monster as Wolf;
     }
 
     public void OnFixedUpdate()
     {
-        
+        deadStateDuration += Time.fixedDeltaTime;
+        if(deadStateDuration > maxDeadStateDuration)
+        {
+            wolf.SetMonsterState(new WolfRespawnState(wolf));
+        }
     }
 
     public void OnEnterState()
     {
-        monster.animator.SetFloat("Speed", monster.navMeshAgent.velocity.magnitude);
-        monster.navMeshAgent.ResetPath();
-        monster.navMeshAgent.speed = 1;
+        wolf.animator.SetFloat("Speed", wolf.navMeshAgent.velocity.magnitude);
+        wolf.animator.SetTrigger("Die");
+        wolf.navMeshAgent.ResetPath();
+        wolf.navMeshAgent.speed = 1;
 
-        // 몬스터가 죽었을 때, 드랍 테이블에 따라 아이템을 필드에 생성합니다.
-        var dropTable = monster.monsterStat.GetDropTable();
+        // 몬스터가 죽었을 때, 드랍 테이블에 따라 아이템을 필드에 생성
+        var dropTable = wolf.monsterStat.GetDropTable();
         foreach (var dropItem in dropTable)
         {
             if(Random.Range(0f, 1f) < dropItem.dropRate)
             {
                 // 현재 몬스터의 위치에서 일정 범위 안에 랜덤한 위치에 아이템 생성
                 var randomPos = Random.insideUnitCircle;
-                var itemPos = monster.transform.position + new Vector3(randomPos.x, 0, randomPos.y);
+                var itemPos = wolf.transform.position + new Vector3(randomPos.x, 0, randomPos.y);
                 var go = FieldItem.CreateFieldItem(dropItem.item, itemPos);
             }
         }
@@ -220,32 +227,34 @@ public class WolfDeadState : IMonsterState
 
     public void OnExitState()
     {
-        
+        wolf.animator.SetTrigger("DieComplete");
     }
 }
 
 
-
+// 이 클래스는 늑대 몬스터의 리스폰 상태를 담당합니다.
 public class WolfRespawnState : IMonsterState
 {
-    private Monster monster;
+    private Monster wolf;
     private float respawnIdle = 0;
-    private readonly float maxRespawnIdle = 1;
+    private const float maxRespawnIdle = 1;
+    private const float minRespawnDistance = 3;
+    private const float maxRespawnDistance = 10;
 
     public WolfRespawnState(Monster monster)
     {
-        this.monster = monster;
+        wolf = monster as Wolf;
     }
 
     public void OnFixedUpdate()
     {
-        if(monster.monsterStat.IsDead())
+        if(wolf.monsterStat.IsDead())
         {
-            monster.SetMonsterState(new WolfDeadState(monster));
+            wolf.SetMonsterState(new WolfDeadState(wolf));
         }
         else if(respawnIdle > maxRespawnIdle)
         {
-            monster.SetMonsterState(new WolfIdleState(monster));
+            wolf.SetMonsterState(new WolfIdleState(wolf));
         }
         else
         {
@@ -255,25 +264,26 @@ public class WolfRespawnState : IMonsterState
 
     public void OnEnterState()
     {
-        monster.animator.SetFloat("Speed", monster.navMeshAgent.velocity.magnitude);
-        monster.monsterStat.RestoreHP();
-        monster.navMeshAgent.ResetPath();
+        wolf.animator.SetFloat("Speed", wolf.navMeshAgent.velocity.magnitude);
+        wolf.monsterStat.RestoreHP();
+        wolf.navMeshAgent.ResetPath();
 
-        // 몬스터가 리스폰될 때, 일정 범위 내의 랜덤한 위치로 몬스터를 이동시킵니다.
+        // 몬스터가 리스폰될 때, 일정 범위 내의 랜덤한 위치로 몬스터를 이동
         while(true)
         {
             var center = new Vector3(Random.Range(-80, -10), 5, Random.Range(85, 125));
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(center, out hit, 10, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(center, out hit, maxRespawnDistance, NavMesh.AllAreas))
             {
-                monster.rigidbody.position = hit.position;
-                return;
+                // monster.rigidbody.position = hit.position;
+                wolf.navMeshAgent.Warp(hit.position);
+                break;
             }
         }
     }
 
     public void OnExitState()
     {
-        
+
     }
 }

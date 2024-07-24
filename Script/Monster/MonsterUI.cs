@@ -4,19 +4,11 @@ using UnityEngine.UI;
 // 이 스크립트는 몬스터의 체력바를 표시합니다. (MonsterStat의 OnHPChangedEvent에 등록됨)
 public class MonsterUI : MonoBehaviour
 {
-    private Camera mainCamera;
+    public Camera mainCamera;
     public Image hpBar;
-    private MonsterStat monsterStat;
-
-    private void Awake() 
-    {
-        mainCamera = Camera.main;
-        monsterStat = GetComponentInParent<MonsterStat>();
-        monsterStat.AddOnHPChangedEvent(SetHPBar);
-    }
 
     // 체력바를 갱신합니다.
-    private void SetHPBar(int hp, int maxHp)
+    public void SetHPBar(int hp, int maxHp)
     {
         hpBar.fillAmount = (float)hp / maxHp;
     }

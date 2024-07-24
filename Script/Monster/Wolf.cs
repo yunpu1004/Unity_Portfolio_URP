@@ -1,18 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+// 이 스크립트는 늑대 몬스터를 담당하며, 몬스터 클래스에서 상속되어 늑대 몬스터 유형의 초기화와 처음 상태를 설정합니다.
+// 전략 패턴과 상태 패턴을 사용하여 몬스터의 초기화 전략과 상태를 설정합니다.
 public class Wolf : Monster
 {
-    protected override IMonsterState SetMonsterStateOnAwake()
+    // 늑대의 초기화 전략을 설정합니다.
+    protected override IAwakeStrategy SetAwakeStrategy()
+    {
+        return new NormalMonsterAwakeStrategy();
+    }
+
+    // 늑대의 초기 상태를 설정합니다.
+    protected override IMonsterState SetMonsterInitialState()
     {
         return new WolfIdleState(this);
     }
     
-    // 이 메소드는 애니메이션 이벤트로 호출됨
-    private void Respawn()
-    {
-        SetMonsterState(new WolfRespawnState(this));
-    }
 }
  
