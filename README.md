@@ -5,7 +5,6 @@
 <h4 align="left"><b>[주요 구현 소개]<br>[Google Drive](https://drive.google.com/file/d/1BOR2ZQ11BQUPQJKgqoQAjAZqi3REEi_f/view?usp=sharing)<br>[네이버 MyBox](http://naver.me/53U7UzFr)</b></h1> 
 
 ## 포트폴리오 개요
-- **개발기간 :** 4주
 - **개발자 :** 홍윤표
 - **장르 :** RPG
 
