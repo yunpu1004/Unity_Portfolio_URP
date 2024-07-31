@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 이 스크립트는 플레이어 또는 몬스터가 공격할때 판정을 담당합니다.
+// 이 스크립트는 플레이어 또는 몬스터가 근접 공격할때의 판정을 담당합니다.
 public class Weapon : MonoBehaviour
 {
     public LayerMask targetLayer;
     private HashSet<Collider> alreadyHit = new HashSet<Collider>();
-    private event Action<Collider> OnHitEvent;
     private BoxCollider boxCollider;
     private PlayerStat playerStat;
     private MonsterStat monsterStat;
@@ -45,7 +44,6 @@ public class Weapon : MonoBehaviour
         }
 
         alreadyHit.Add(other);
-        OnHitEvent?.Invoke(other);
     }
 
     // 피격 판정을 활성화 합니다.
@@ -60,10 +58,5 @@ public class Weapon : MonoBehaviour
     {
         boxCollider.enabled = false;
         alreadyHit.Clear();
-    }
-
-    public void AddOnHitEvent(Action<Collider> action)
-    {
-        OnHitEvent += action;
     }
 }

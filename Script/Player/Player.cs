@@ -270,7 +270,7 @@ public class Player : MonoBehaviour
         Vector3 inputDirection = new Vector3(input.move.x, 0.0f, input.move.y).normalized;
         if (input.move != Vector2.zero)
         {
-            targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +mainCamera.transform.eulerAngles.y;
+            targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
             float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmoothTime);
             transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
         }

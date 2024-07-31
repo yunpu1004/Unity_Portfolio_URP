@@ -10,7 +10,7 @@ public abstract class Monster : MonoBehaviour
     public Transform playerTransform;
     public MonsterStat monsterStat;
     public Rigidbody rigidbody;
-    private Weapon weapon;
+    protected Weapon weapon;
     private IMonsterState monsterState;
 
     void Awake()
@@ -62,22 +62,9 @@ public abstract class Monster : MonoBehaviour
         monsterState.OnFixedUpdate();
     }
 
+    // 이 메소드는 애니메이션 이벤트로 호출됨
+    protected abstract void Attack();
 
     // 이 메소드는 애니메이션 이벤트로 호출됨
-    private void ActivateWeapon()
-    {
-        weapon.ActivateWeapon();
-    }
-
-    // 이 메소드는 애니메이션 이벤트로 호출됨
-    private void DeactivateWeapon()
-    {
-        weapon.DeactivateWeapon();
-    }
-
-    // 이 메소드는 애니메이션 이벤트로 호출됨
-    private void OnDeathAnimationEnd()
-    {
-        SetMonsterState(new WolfRespawnState(this));
-    }
+    protected abstract void StopAttack();
 }

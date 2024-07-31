@@ -7,6 +7,16 @@ public class Golem : Monster
     // 골렘 몬스터가 대기 상태일때 서있는 위치입니다.
     public Transform idleWayPoint;
 
+    protected override void Attack()
+    {
+        weapon.ActivateWeapon();
+    }
+
+    protected override void StopAttack()
+    {
+        weapon.DeactivateWeapon();
+    }
+
     // 골렘의 초기화 전략을 설정합니다.
     protected override IAwakeStrategy SetAwakeStrategy()
     {

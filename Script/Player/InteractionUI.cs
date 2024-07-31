@@ -32,7 +32,7 @@ public class InteractionUI : MonoBehaviour
             nearInteraction = nearestInteraction;
             interactable = true;
             content.gameObject.SetActive(true);
-            interactionText.text = nearInteraction.GetInteractionText();
+            interactionText.text = nearInteraction.interactionText;
         }
     }
 }

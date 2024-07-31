@@ -7,16 +7,14 @@ using UnityEngine;
 // 또한 옵저버 패턴을 사용하여 가장 가까운 상호작용을 찾을 때마다 이벤트를 발생시킵니다.
 public class Interaction : MonoBehaviour
 {
-    private string interactionText;
-    private Action interactionAction;
+    public string interactionText { get; private set; }
+    public Action interactionAction { get; private set; }
     private SphereCollider sphereCollider;
 
     private static List<Interaction> nearInteractions = new List<Interaction>();
     private static Interaction nearestInteraction = null;
     private static Transform player;
     private static Action<Interaction> OnNearestInteractionChanged;
-    public string GetInteractionText() => interactionText;
-    public Action GetInteractionAction() => interactionAction;
 
     private void Awake() 
     {
@@ -44,7 +42,7 @@ public class Interaction : MonoBehaviour
         {
             StartCoroutine(CheckPlayerTrigger());
             nearInteractions.Add(this);
-            GetNearestInteraction();
+            UpdateNeareastInteraction();
         }
     }
 
@@ -52,12 +50,12 @@ public class Interaction : MonoBehaviour
     private void OnDestroy() 
     {
         nearInteractions.Remove(this);
-        GetNearestInteraction();
+        UpdateNeareastInteraction();
     }
 
 
     // 플레이어 주변에 있는 상호작용 객체 중 가장 가까운 객체를 찾습니다.
-    private static Interaction GetNearestInteraction()
+    private static void UpdateNeareastInteraction()
     {
         if(player == null)
         {
@@ -81,7 +79,6 @@ public class Interaction : MonoBehaviour
         {
             nearestInteraction = null;
             OnNearestInteractionChanged?.Invoke(nearestInteraction);
-            return null;
         }
 
         // 주변에 상호작용이 한 개 이상 있으면 가장 가까운 상호작용을 찾아서 설정합니다.
@@ -100,7 +97,6 @@ public class Interaction : MonoBehaviour
             }
 
             OnNearestInteractionChanged?.Invoke(nearestInteraction);
-            return nearestInteraction;
         }
     }
 
@@ -111,7 +107,7 @@ public class Interaction : MonoBehaviour
         nearestInteraction.ExecuteInteraction();
 
         // 상호작용 결과 해당 객체가 파괴되는 경우가 있으므로, 다시 가장 가까운 상호작용을 찾습니다. (ex. 필드 아이템)
-        GetNearestInteraction();
+        UpdateNeareastInteraction();
     }
 
     public static void AddOnNearestInteractionChangedEvent(Action<Interaction> listener)
@@ -129,6 +125,6 @@ public class Interaction : MonoBehaviour
         }
         
         nearInteractions.Remove(this);
-        GetNearestInteraction();     
+        UpdateNeareastInteraction();     
     }
 }

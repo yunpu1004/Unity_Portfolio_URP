@@ -2,6 +2,16 @@
 // 전략 패턴과 상태 패턴을 사용하여 몬스터의 초기화 전략과 상태를 설정합니다.
 public class Wolf : Monster
 {
+    protected override void Attack()
+    {
+        weapon.ActivateWeapon();
+    }
+
+    protected override void StopAttack()
+    {
+        weapon.DeactivateWeapon();
+    }
+
     // 늑대의 초기화 전략을 설정합니다.
     protected override IAwakeStrategy SetAwakeStrategy()
     {
@@ -13,6 +23,5 @@ public class Wolf : Monster
     {
         return new WolfIdleState(this);
     }
-    
 }
  
