@@ -62,9 +62,95 @@ public abstract class Monster : MonoBehaviour
         monsterState.OnFixedUpdate();
     }
 
-    // 이 메소드는 애니메이션 이벤트로 호출됨
-    protected abstract void Attack();
+    // 몬스터가 공격합니다.
+    // 애니메이션이 재생되면, 지정된 시점에 ActivateWeapon과 DeactivateWeapon 메서드가 실행됩니다.
+    public virtual void Attack()
+    {
+        animator.SetTrigger("Attack");
+    }
 
-    // 이 메소드는 애니메이션 이벤트로 호출됨
-    protected abstract void StopAttack();
+    // 몬스터가 사망합니다.
+    public virtual void Die()
+    {
+        animator.SetTrigger("Die");
+        navMeshAgent.ResetPath();
+        animator.SetFloat("Speed", navMeshAgent.velocity.magnitude);
+        navMeshAgent.speed = 1;
+    }
+
+    // 몬스터가 리스폰합니다.
+    public virtual void Respawn()
+    {
+        animator.SetTrigger("Respawn");
+        monsterStat.RestoreHP();
+        navMeshAgent.ResetPath();
+
+        // 일정 범위 내의 랜덤한 위치로 몬스터를 이동
+        while(true)
+        {
+            var center = new Vector3(Random.Range(-80, -10), 5, Random.Range(85, 125));
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(center, out hit, 10, NavMesh.AllAreas))
+            {
+                navMeshAgent.Warp(hit.position);
+                break;
+            }
+        }
+    }
+
+    // 몬스터가 아이템을 드랍합니다.
+    public virtual void DropItem()
+    {
+        // 몬스터가 죽었을 때, 드랍 테이블에 따라 아이템을 필드에 생성
+        var dropTable = monsterStat.GetDropTable();
+        foreach (var dropItem in dropTable)
+        {
+            if(Random.Range(0f, 1f) < dropItem.dropRate)
+            {
+                // 현재 몬스터의 위치에서 일정 범위 안에 랜덤한 위치에 아이템 생성
+                var randomPos = Random.insideUnitCircle;
+                var itemPos = transform.position + new Vector3(randomPos.x, 0, randomPos.y);
+                var go = FieldItem.CreateFieldItem(dropItem.item, itemPos);
+            }
+        }
+    }
+
+    // 몬스터가 이동합니다.
+    public virtual void Move(Vector3 destination)
+    {
+        // 몬스터의 이동 목적지 설정
+        navMeshAgent.SetDestination(destination);
+
+        // 목적지를 바라보는 방향 계산
+        Vector3 direction = (destination - transform.position).normalized;
+        direction.y = 0;
+
+        // 몬스터의 바라볼 방향으로 쿼터니언을 계산
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+        // 회전을 부드럽게 조절
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+    }
+
+    // 몬스터가 목적지를 초기화 하고 멈춥니다.
+    public virtual void Stop()
+    {
+        navMeshAgent.ResetPath();
+        navMeshAgent.speed = 0;
+        animator.SetFloat("Speed", 0);
+    }
+
+    // 공격 애니메이션중 실행되는 이벤트
+    // 무기를 활성화합니다.
+    private void ActivateWeapon()
+    {
+        weapon.ActivateWeapon();
+    }
+
+    // 공격 애니메이션중 실행되는 이벤트
+    // 무기를 비활성화합니다.
+    private void DeactivateWeapon()
+    {
+        weapon.DeactivateWeapon();
+    }
 }

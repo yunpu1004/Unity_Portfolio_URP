@@ -4,16 +4,6 @@ using UnityEngine;
 // 전략 패턴과 상태 패턴을 사용하여 몬스터의 초기화 전략과 상태를 설정합니다.
 public class Snake : Monster
 {
-    protected override void Attack()
-    {
-        weapon.ActivateWeapon();
-    }
-
-    protected override void StopAttack()
-    {
-        weapon.DeactivateWeapon();
-    }
-    
     // 뱀의 초기화 전략을 설정합니다.
     protected override IAwakeStrategy SetAwakeStrategy()
     {
@@ -26,11 +16,13 @@ public class Snake : Monster
         return new SnakeIdleState(this);
     }
 
-    public void ProjectileAttack()
+    // 공격 애니메이션중 실행되는 이벤트
+    // 투사체를 발사합니다.
+    private void ShotProjectile()
     {
         Transform player = GameObject.Find("Player").transform;
         GameObject go = Instantiate(Resources.Load("Prefabs/뱀 투사체"), transform.position, Quaternion.identity) as GameObject;
-        go.transform.Translate(new Vector3(-0.4f, 1.1f, 0));
+        go.transform.Translate(new Vector3(0, 1.1f, 0));
         Projectile projectile = go.GetComponent<Projectile>();
         MonsterStat monsterStat = GetComponent<MonsterStat>();
         projectile.damage = monsterStat.GetAtk();
